@@ -134,6 +134,7 @@ function AdminPage() {
     const parsed = gameSchema.safeParse({
       name: g.name,
       link: g.link,
+      display_text: g.display_text ?? "",
       players: g.players,
       online: g.online,
       sort_order: g.sort_order,
