@@ -100,7 +100,7 @@ function GamesPage() {
                   : "cursor-not-allowed border-border/50 bg-card/50 opacity-60"
               }`;
               return g.online && g.link ? (
-                <a key={g.id} href={g.link} target="_blank" rel="noopener noreferrer" className={cls}>
+                <a key={g.id} href={g.link} className={cls}>
                   {Inner}
                 </a>
               ) : (
