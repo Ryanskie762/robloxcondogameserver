@@ -1,9 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import { Gamepad2, MessagesSquare } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SiteFooter() {
   const { t } = useApp();
+  const [discordUrl, setDiscordUrl] = useState("");
+
+  useEffect(() => {
+    supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "discord_url")
+      .maybeSingle()
+      .then(({ data }) => setDiscordUrl(data?.value ?? ""));
+  }, []);
   return (
     <footer className="mt-20 border-t border-border/50 bg-surface/50">
       <div className="mx-auto max-w-6xl px-4 py-12">
