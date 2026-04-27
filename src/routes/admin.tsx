@@ -213,6 +213,48 @@ function AdminPage() {
         </div>
       </div>
 
+      <div className="mb-8 rounded-xl border border-border bg-card p-5 shadow-card">
+        <h2 className="mb-1 font-display text-xl font-bold">Site Settings</h2>
+        <p className="mb-4 text-xs text-muted-foreground">
+          Manage links shown across the public site.
+        </p>
+        <label className="block">
+          <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+            Discord server link
+          </span>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={discordUrl}
+              maxLength={500}
+              onChange={(e) => setDiscordUrl(e.target.value)}
+              placeholder="https://discord.gg/your-invite"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              onClick={saveDiscord}
+              disabled={discordSaving}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60"
+            >
+              {discordSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Save
+            </button>
+          </div>
+        </label>
+        {discordMsg && (
+          <p
+            className={`mt-2 text-xs ${
+              discordMsg.type === "ok" ? "text-success" : "text-destructive"
+            }`}
+          >
+            {discordMsg.type === "ok" ? "✓" : "⚠"} {discordMsg.msg}
+          </p>
+        )}
+      </div>
+
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-display text-xl font-bold">Community Games</h2>
         <button
