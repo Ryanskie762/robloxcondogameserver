@@ -169,6 +169,7 @@ function AdminPage() {
       .insert({
         name: "New Game",
         link: "",
+        display_text: "",
         players: 0,
         online: false,
         sort_order: nextOrder,
