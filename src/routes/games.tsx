@@ -64,6 +64,7 @@ function GamesPage() {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {games.map((g) => {
+              const linkLabel = (g.display_text?.trim() || g.link)?.trim();
               const Inner = (
                 <>
                   <div className="min-w-0">
@@ -71,6 +72,11 @@ function GamesPage() {
                     <div className="mt-0.5 text-xs text-muted-foreground">
                       {t("games.updated")} {today}
                     </div>
+                    {g.online && g.link && linkLabel && (
+                      <div className="mt-1 truncate text-xs text-primary/90">
+                        {linkLabel}
+                      </div>
+                    )}
                     {g.online && (
                       <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
                         <Users className="h-3 w-3" /> {g.players} {t("games.players")}
