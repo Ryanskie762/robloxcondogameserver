@@ -304,13 +304,14 @@ function AdminPage() {
                   </label>
                   <label className="md:col-span-3">
                     <span className="mb-1 block text-xs font-semibold text-muted-foreground">
-                      Display text
+                      Display text URL
                     </span>
                     <input
                       value={g.display_text ?? ""}
                       maxLength={200}
                       onChange={(e) => updateLocal(g.id, { display_text: e.target.value })}
-                      placeholder="e.g. Join now →"
+                      placeholder="e.g. Click to play"
+                      title="Friendly text shown under the game name (instead of the raw URL)"
                       className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
                     />
                   </label>
