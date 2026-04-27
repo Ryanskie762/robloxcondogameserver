@@ -17,6 +17,7 @@ export type Database = {
       community_games: {
         Row: {
           created_at: string
+          display_text: string
           id: string
           link: string
           name: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          display_text?: string
           id?: string
           link?: string
           name: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          display_text?: string
           id?: string
           link?: string
           name?: string
@@ -44,6 +47,30 @@ export type Database = {
           players?: number
           sort_order?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
         }
         Relationships: []
       }
