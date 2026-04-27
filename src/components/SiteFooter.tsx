@@ -89,8 +89,13 @@ export function SiteFooter() {
               {t("footer.community")}
             </h4>
             <a
-              href="#"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#5865F2] px-4 py-2 text-sm font-semibold text-white transition-transform hover:scale-105"
+              href={discordUrl || "#"}
+              target={discordUrl ? "_blank" : undefined}
+              rel={discordUrl ? "noopener noreferrer" : undefined}
+              aria-disabled={!discordUrl}
+              className={`inline-flex items-center gap-2 rounded-lg bg-[#5865F2] px-4 py-2 text-sm font-semibold text-white transition-transform ${
+                discordUrl ? "hover:scale-105" : "cursor-not-allowed opacity-60"
+              }`}
             >
               <MessagesSquare className="h-4 w-4" />
               {t("footer.discord")}
