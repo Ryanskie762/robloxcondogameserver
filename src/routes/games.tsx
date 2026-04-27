@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
-import { Activity, Users } from "lucide-react";
+import { Activity, Users, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/games")({
   head: () => ({
@@ -18,21 +21,26 @@ export const Route = createFileRoute("/games")({
   component: GamesPage,
 });
 
-const GAMES = [
-  { name: "Sword Arena 7738", players: 209, online: true },
-  { name: "Anni's Place", players: 230, online: true },
-  { name: "Slap Royale", players: 191, online: true },
-  { name: "V4 Duo Mode", players: 217, online: true },
-  { name: "Sentinel Console", players: 206, online: true },
-  { name: "RO-63 Classic", players: 0, online: false },
-  { name: "Meet Neko [Solo]", players: 0, online: false },
-  { name: "Cabin Photography [2P]", players: 0, online: false },
-];
+type Game = Tables<"community_games">;
 
 function GamesPage() {
   const { t } = useApp();
-  const onlineCount = GAMES.filter((g) => g.online).length;
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
   const today = new Date().toLocaleDateString("en-GB");
+
+  useEffect(() => {
+    supabase
+      .from("community_games")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        setGames(data ?? []);
+        setLoading(false);
+      });
+  }, []);
+
+  const onlineCount = games.filter((g) => g.online).length;
 
   return (
     <div>
@@ -44,44 +52,59 @@ function GamesPage() {
             <span className="font-semibold">{t("games.status")}</span>
           </div>
           <span className="text-sm text-muted-foreground">
-            <strong className="text-success">{onlineCount}</strong>/{GAMES.length} {t("games.online")}
+            <strong className="text-success">{onlineCount}</strong>/{games.length}{" "}
+            {t("games.online")}
           </span>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {GAMES.map((g) => (
-            <button
-              key={g.name}
-              disabled={!g.online}
-              className={`group flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
-                g.online
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {games.map((g) => {
+              const Inner = (
+                <>
+                  <div className="min-w-0">
+                    <div className="truncate font-semibold">{g.name}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
+                      {t("games.updated")} {today}
+                    </div>
+                    {g.online && (
+                      <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Users className="h-3 w-3" /> {g.players} {t("games.players")}
+                      </div>
+                    )}
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider ${
+                      g.online
+                        ? "bg-success/15 text-success"
+                        : "bg-destructive/15 text-destructive"
+                    }`}
+                  >
+                    {g.online ? `🟢 ${t("games.statusOn")}` : t("games.statusOff")}
+                  </span>
+                </>
+              );
+              const cls = `group flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
+                g.online && g.link
                   ? "border-border bg-card shadow-card hover:-translate-y-0.5 hover:border-glow hover:shadow-glow"
                   : "cursor-not-allowed border-border/50 bg-card/50 opacity-60"
-              }`}
-            >
-              <div className="min-w-0">
-                <div className="truncate font-semibold">{g.name}</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  {t("games.updated")} {today}
+              }`;
+              return g.online && g.link ? (
+                <a key={g.id} href={g.link} target="_blank" rel="noopener noreferrer" className={cls}>
+                  {Inner}
+                </a>
+              ) : (
+                <div key={g.id} className={cls}>
+                  {Inner}
                 </div>
-                {g.online && (
-                  <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                    <Users className="h-3 w-3" /> {g.players} {t("games.players")}
-                  </div>
-                )}
-              </div>
-              <span
-                className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider ${
-                  g.online
-                    ? "bg-success/15 text-success"
-                    : "bg-destructive/15 text-destructive"
-                }`}
-              >
-                {g.online ? `🟢 ${t("games.statusOn")}` : t("games.statusOff")}
-              </span>
-            </button>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
     </div>
   );

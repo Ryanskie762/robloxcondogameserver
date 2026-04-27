@@ -13,6 +13,8 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PrivateServerRouteImport } from './routes/private-server'
 import { Route as GamesRouteImport } from './routes/games'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SupportRoute = SupportRouteImport.update({
@@ -35,6 +37,16 @@ const GamesRoute = GamesRouteImport.update({
   path: '/games',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +55,8 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/games': typeof GamesRoute
   '/private-server': typeof PrivateServerRoute
   '/settings': typeof SettingsRoute
@@ -50,6 +64,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/games': typeof GamesRoute
   '/private-server': typeof PrivateServerRoute
   '/settings': typeof SettingsRoute
@@ -58,6 +74,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
   '/games': typeof GamesRoute
   '/private-server': typeof PrivateServerRoute
   '/settings': typeof SettingsRoute
@@ -65,14 +83,38 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/games' | '/private-server' | '/settings' | '/support'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/games'
+    | '/private-server'
+    | '/settings'
+    | '/support'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/games' | '/private-server' | '/settings' | '/support'
-  id: '__root__' | '/' | '/games' | '/private-server' | '/settings' | '/support'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/games'
+    | '/private-server'
+    | '/settings'
+    | '/support'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/games'
+    | '/private-server'
+    | '/settings'
+    | '/support'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
   GamesRoute: typeof GamesRoute
   PrivateServerRoute: typeof PrivateServerRoute
   SettingsRoute: typeof SettingsRoute
@@ -109,6 +151,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GamesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -121,6 +177,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
   GamesRoute: GamesRoute,
   PrivateServerRoute: PrivateServerRoute,
   SettingsRoute: SettingsRoute,
