@@ -1,0 +1,313 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import type { Tables } from "@/integrations/supabase/types";
+import {
+  Plus,
+  Trash2,
+  Save,
+  LogOut,
+  Loader2,
+  GripVertical,
+  ExternalLink,
+  ShieldAlert,
+} from "lucide-react";
+
+export const Route = createFileRoute("/admin")({
+  head: () => ({
+    meta: [
+      { title: "Admin Panel — Game Hub" },
+      { name: "description", content: "Manage community games." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: AdminPage,
+});
+
+type Game = Tables<"community_games">;
+
+const gameSchema = z.object({
+  name: z.string().trim().min(1, "Name required").max(100),
+  link: z.string().trim().max(500).url("Must be a valid URL").or(z.literal("")),
+  players: z.number().int().min(0).max(100000),
+  online: z.boolean(),
+  sort_order: z.number().int().min(0).max(9999),
+});
+
+function AdminPage() {
+  const { user, isAdmin, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [games, setGames] = useState<Game[]>([]);
+  const [loadingGames, setLoadingGames] = useState(true);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [errorId, setErrorId] = useState<{ id: string; msg: string } | null>(null);
+
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/auth" });
+  }, [loading, user, navigate]);
+
+  const loadGames = async () => {
+    setLoadingGames(true);
+    const { data } = await supabase
+      .from("community_games")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    setGames(data ?? []);
+    setLoadingGames(false);
+  };
+
+  useEffect(() => {
+    if (isAdmin) loadGames();
+  }, [isAdmin]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  if (!isAdmin) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-16 text-center">
+        <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-destructive/15">
+          <ShieldAlert className="h-7 w-7 text-destructive" />
+        </div>
+        <h1 className="font-display text-2xl font-bold">Not authorized</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Your account ({user.email}) doesn't have admin access. Ask the project owner to grant you the
+          <code className="mx-1 rounded bg-secondary px-1.5 py-0.5 text-xs">admin</code>
+          role.
+        </p>
+        <button
+          onClick={async () => {
+            await signOut();
+            navigate({ to: "/auth" });
+          }}
+          className="mt-6 inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:border-glow"
+        >
+          <LogOut className="h-4 w-4" /> Sign out
+        </button>
+      </div>
+    );
+  }
+
+  const updateLocal = (id: string, patch: Partial<Game>) => {
+    setGames((prev) => prev.map((g) => (g.id === id ? { ...g, ...patch } : g)));
+  };
+
+  const saveGame = async (g: Game) => {
+    setErrorId(null);
+    const parsed = gameSchema.safeParse({
+      name: g.name,
+      link: g.link,
+      players: g.players,
+      online: g.online,
+      sort_order: g.sort_order,
+    });
+    if (!parsed.success) {
+      setErrorId({ id: g.id, msg: parsed.error.issues[0].message });
+      return;
+    }
+    setSavingId(g.id);
+    const { error } = await supabase
+      .from("community_games")
+      .update(parsed.data)
+      .eq("id", g.id);
+    setSavingId(null);
+    if (error) setErrorId({ id: g.id, msg: error.message });
+  };
+
+  const deleteGame = async (id: string) => {
+    if (!confirm("Delete this game?")) return;
+    const { error } = await supabase.from("community_games").delete().eq("id", id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    setGames((prev) => prev.filter((g) => g.id !== id));
+  };
+
+  const addGame = async () => {
+    const nextOrder = (games[games.length - 1]?.sort_order ?? 0) + 1;
+    const { data, error } = await supabase
+      .from("community_games")
+      .insert({
+        name: "New Game",
+        link: "",
+        players: 0,
+        online: false,
+        sort_order: nextOrder,
+      })
+      .select()
+      .single();
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    if (data) setGames((prev) => [...prev, data]);
+  };
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-10">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold">
+            <span className="text-gradient-brand">Admin Panel</span>
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Signed in as <strong className="text-foreground">{user.email}</strong>
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Link
+            to="/games"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:border-glow"
+          >
+            <ExternalLink className="h-4 w-4" /> View public page
+          </Link>
+          <button
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/" });
+            }}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium hover:border-glow"
+          >
+            <LogOut className="h-4 w-4" /> Sign out
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="font-display text-xl font-bold">Community Games</h2>
+        <button
+          onClick={addGame}
+          className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]"
+        >
+          <Plus className="h-4 w-4" /> Add game
+        </button>
+      </div>
+
+      {loadingGames ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {games.map((g) => (
+            <div
+              key={g.id}
+              className="rounded-xl border border-border bg-card p-4 shadow-card"
+            >
+              <div className="flex flex-col gap-3 md:flex-row md:items-start">
+                <GripVertical className="hidden h-5 w-5 shrink-0 self-center text-muted-foreground md:block" />
+                <div className="grid flex-1 gap-3 md:grid-cols-12">
+                  <label className="md:col-span-4">
+                    <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+                      Name
+                    </span>
+                    <input
+                      value={g.name}
+                      maxLength={100}
+                      onChange={(e) => updateLocal(g.id, { name: e.target.value })}
+                      className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+                    />
+                  </label>
+                  <label className="md:col-span-5">
+                    <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+                      Link (URL)
+                    </span>
+                    <input
+                      value={g.link}
+                      maxLength={500}
+                      onChange={(e) => updateLocal(g.id, { link: e.target.value })}
+                      placeholder="https://..."
+                      className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+                    />
+                  </label>
+                  <label className="md:col-span-1">
+                    <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+                      Order
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={g.sort_order}
+                      onChange={(e) =>
+                        updateLocal(g.id, { sort_order: Number(e.target.value) || 0 })
+                      }
+                      className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+                    />
+                  </label>
+                  <label className="md:col-span-1">
+                    <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+                      Players
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={g.players}
+                      onChange={(e) =>
+                        updateLocal(g.id, { players: Number(e.target.value) || 0 })
+                      }
+                      className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+                    />
+                  </label>
+                  <label className="flex flex-col md:col-span-1">
+                    <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+                      Online
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateLocal(g.id, { online: !g.online })}
+                      className={`flex-1 rounded-lg border px-3 py-2 text-xs font-bold transition-colors ${
+                        g.online
+                          ? "border-success/40 bg-success/15 text-success"
+                          : "border-destructive/40 bg-destructive/15 text-destructive"
+                      }`}
+                    >
+                      {g.online ? "ON" : "OFF"}
+                    </button>
+                  </label>
+                </div>
+                <div className="flex gap-2 md:flex-col">
+                  <button
+                    onClick={() => saveGame(g)}
+                    disabled={savingId === g.id}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-gradient-brand px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-60 md:flex-none"
+                  >
+                    {savingId === g.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Save className="h-3.5 w-3.5" />
+                    )}
+                    Save
+                  </button>
+                  <button
+                    onClick={() => deleteGame(g.id)}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20 md:flex-none"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Delete
+                  </button>
+                </div>
+              </div>
+              {errorId?.id === g.id && (
+                <p className="mt-2 text-xs text-destructive">⚠ {errorId.msg}</p>
+              )}
+            </div>
+          ))}
+          {games.length === 0 && (
+            <p className="py-12 text-center text-sm text-muted-foreground">
+              No games yet. Click <strong>Add game</strong> to create one.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
