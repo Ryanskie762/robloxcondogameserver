@@ -62,8 +62,32 @@ function AdminPage() {
     setLoadingGames(false);
   };
 
+  const loadDiscord = async () => {
+    const { data } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "discord_url")
+      .maybeSingle();
+    setDiscordUrl(data?.value ?? "");
+  };
+
+  const saveDiscord = async () => {
+    setDiscordMsg(null);
+    setDiscordSaving(true);
+    const trimmed = discordUrl.trim().slice(0, 500);
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({ key: "discord_url", value: trimmed }, { onConflict: "key" });
+    setDiscordSaving(false);
+    if (error) setDiscordMsg({ type: "err", msg: error.message });
+    else setDiscordMsg({ type: "ok", msg: "Saved!" });
+  };
+
   useEffect(() => {
-    if (isAdmin) loadGames();
+    if (isAdmin) {
+      loadGames();
+      loadDiscord();
+    }
   }, [isAdmin]);
 
   if (loading) {
