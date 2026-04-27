@@ -31,6 +31,7 @@ type Game = Tables<"community_games">;
 const gameSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
   link: z.string().trim().max(500),
+  display_text: z.string().trim().max(200),
   players: z.number().int().min(0).max(100000),
   online: z.boolean(),
   sort_order: z.number().int().min(0).max(9999),
