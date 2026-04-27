@@ -44,6 +44,9 @@ function AdminPage() {
   const [loadingGames, setLoadingGames] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<{ id: string; msg: string } | null>(null);
+  const [discordUrl, setDiscordUrl] = useState("");
+  const [discordSaving, setDiscordSaving] = useState(false);
+  const [discordMsg, setDiscordMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
