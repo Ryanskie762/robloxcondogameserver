@@ -1,7 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { AppProvider } from "@/contexts/AppContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageModal } from "@/components/LanguageModal";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -37,7 +36,7 @@ export const Route = createRootRoute({
         content:
           "Your ultimate destination for community games, private servers, and exclusive tools.",
       },
-      { property: "og:title", content: "Game Hub" },
+      { property: "og:title", content: "Game Hub — Community games, private servers & tools" },
       {
         property: "og:description",
         content:
@@ -45,6 +44,12 @@ export const Route = createRootRoute({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Game Hub — Community games, private servers & tools" },
+      { name: "description", content: "Site Duplicator creates a complete replica of a given website, including its structure and content." },
+      { property: "og:description", content: "Site Duplicator creates a complete replica of a given website, including its structure and content." },
+      { name: "twitter:description", content: "Site Duplicator creates a complete replica of a given website, including its structure and content." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ca599cc-5984-4363-81c7-3e364e565de7/id-preview-b55665fd--b5f8586e-ae1e-4fdf-a9c0-640a59b11280.lovable.app-1777302031168.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ca599cc-5984-4363-81c7-3e364e565de7/id-preview-b55665fd--b5f8586e-ae1e-4fdf-a9c0-640a59b11280.lovable.app-1777302031168.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -75,17 +80,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <AuthProvider>
-      <AppProvider>
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <SiteFooter />
-          <LanguageModal />
-        </div>
-      </AppProvider>
-    </AuthProvider>
+    <AppProvider>
+      <div className="flex min-h-screen flex-col">
+        <SiteHeader />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <SiteFooter />
+        <LanguageModal />
+      </div>
+    </AppProvider>
   );
 }
