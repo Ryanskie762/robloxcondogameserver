@@ -31,6 +31,7 @@ type Avatar = Tables<"private_server_avatars">;
 function PrivateServerPage() {
   const { t } = useApp();
   const [avatars, setAvatars] = useState<Avatar[]>([]);
+  const [serverUrl, setServerUrl] = useState("");
 
   useEffect(() => {
     supabase
@@ -38,6 +39,12 @@ function PrivateServerPage() {
       .select("*")
       .order("sort_order", { ascending: true })
       .then(({ data }) => setAvatars(data ?? []));
+    supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "private_server_url")
+      .maybeSingle()
+      .then(({ data }) => setServerUrl(data?.value ?? ""));
   }, []);
 
   return (
@@ -82,10 +89,19 @@ function PrivateServerPage() {
               ))}
             </div>
 
-            <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-brand py-3.5 font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.01]">
+            <a
+              href={serverUrl || "#"}
+              onClick={(e) => {
+                if (!serverUrl) e.preventDefault();
+              }}
+              aria-disabled={!serverUrl}
+              className={`mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-brand py-3.5 font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.01] ${
+                !serverUrl ? "pointer-events-none opacity-60" : ""
+              }`}
+            >
               <Zap className="h-4 w-4" />
               {t("server.enter")}
-            </button>
+            </a>
           </div>
         </div>
       </section>

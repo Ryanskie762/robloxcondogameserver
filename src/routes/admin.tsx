@@ -48,6 +48,9 @@ function AdminPage() {
   const [discordUrl, setDiscordUrl] = useState("");
   const [discordSaving, setDiscordSaving] = useState(false);
   const [discordMsg, setDiscordMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [serverUrl, setServerUrl] = useState("");
+  const [serverSaving, setServerSaving] = useState(false);
+  const [serverMsg, setServerMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [avatars, setAvatars] = useState<Avatar[]>([]);
   const [avatarSavingId, setAvatarSavingId] = useState<string | null>(null);
 
@@ -65,13 +68,14 @@ function AdminPage() {
     setLoadingGames(false);
   };
 
-  const loadDiscord = async () => {
+  const loadSettings = async () => {
     const { data } = await supabase
       .from("site_settings")
-      .select("value")
-      .eq("key", "discord_url")
-      .maybeSingle();
-    setDiscordUrl(data?.value ?? "");
+      .select("key,value")
+      .in("key", ["discord_url", "private_server_url"]);
+    const map = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
+    setDiscordUrl(map["discord_url"] ?? "");
+    setServerUrl(map["private_server_url"] ?? "");
   };
 
   const saveDiscord = async () => {
@@ -86,10 +90,22 @@ function AdminPage() {
     else setDiscordMsg({ type: "ok", msg: "Saved!" });
   };
 
+  const saveServerUrl = async () => {
+    setServerMsg(null);
+    setServerSaving(true);
+    const trimmed = serverUrl.trim().slice(0, 500);
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({ key: "private_server_url", value: trimmed }, { onConflict: "key" });
+    setServerSaving(false);
+    if (error) setServerMsg({ type: "err", msg: error.message });
+    else setServerMsg({ type: "ok", msg: "Saved!" });
+  };
+
   useEffect(() => {
     if (isAdmin) {
       loadGames();
-      loadDiscord();
+      loadSettings();
       loadAvatars();
     }
   }, [isAdmin]);
@@ -299,6 +315,42 @@ function AdminPage() {
             }`}
           >
             {discordMsg.type === "ok" ? "✓" : "⚠"} {discordMsg.msg}
+          </p>
+        )}
+
+        <label className="mt-4 block">
+          <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+            Private Server "Enter Server" link
+          </span>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={serverUrl}
+              maxLength={500}
+              onChange={(e) => setServerUrl(e.target.value)}
+              placeholder="https://www.roblox.com/games/..."
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              onClick={saveServerUrl}
+              disabled={serverSaving}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60"
+            >
+              {serverSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Save
+            </button>
+          </div>
+        </label>
+        {serverMsg && (
+          <p
+            className={`mt-2 text-xs ${
+              serverMsg.type === "ok" ? "text-success" : "text-destructive"
+            }`}
+          >
+            {serverMsg.type === "ok" ? "✓" : "⚠"} {serverMsg.msg}
           </p>
         )}
       </div>
