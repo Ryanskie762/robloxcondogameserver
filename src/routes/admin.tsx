@@ -27,6 +27,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 type Game = Tables<"community_games">;
+type Avatar = Tables<"private_server_avatars">;
 
 const gameSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
