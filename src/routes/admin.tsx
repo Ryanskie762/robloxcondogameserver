@@ -48,6 +48,8 @@ function AdminPage() {
   const [discordUrl, setDiscordUrl] = useState("");
   const [discordSaving, setDiscordSaving] = useState(false);
   const [discordMsg, setDiscordMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [avatars, setAvatars] = useState<Avatar[]>([]);
+  const [avatarSavingId, setAvatarSavingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
