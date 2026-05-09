@@ -51,6 +51,9 @@ function AdminPage() {
   const [serverUrl, setServerUrl] = useState("");
   const [serverSaving, setServerSaving] = useState(false);
   const [serverMsg, setServerMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [serverName, setServerName] = useState("");
+  const [serverNameSaving, setServerNameSaving] = useState(false);
+  const [serverNameMsg, setServerNameMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [avatars, setAvatars] = useState<Avatar[]>([]);
   const [avatarSavingId, setAvatarSavingId] = useState<string | null>(null);
 
