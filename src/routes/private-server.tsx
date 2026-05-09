@@ -32,6 +32,7 @@ function PrivateServerPage() {
   const { t } = useApp();
   const [avatars, setAvatars] = useState<Avatar[]>([]);
   const [serverUrl, setServerUrl] = useState("");
+  const [serverName, setServerName] = useState("Brookside RP Lounge");
 
   useEffect(() => {
     supabase
@@ -41,10 +42,13 @@ function PrivateServerPage() {
       .then(({ data }) => setAvatars(data ?? []));
     supabase
       .from("site_settings")
-      .select("value")
-      .eq("key", "private_server_url")
-      .maybeSingle()
-      .then(({ data }) => setServerUrl(data?.value ?? ""));
+      .select("key,value")
+      .in("key", ["private_server_url", "private_server_name"])
+      .then(({ data }) => {
+        const map = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
+        setServerUrl(map["private_server_url"] ?? "");
+        if (map["private_server_name"]) setServerName(map["private_server_name"]);
+      });
   }, []);
 
   return (
