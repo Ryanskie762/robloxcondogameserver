@@ -336,6 +336,42 @@ function AdminPage() {
 
         <label className="mt-4 block">
           <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+            Private Server name
+          </span>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={serverName}
+              maxLength={100}
+              onChange={(e) => setServerName(e.target.value)}
+              placeholder="e.g. Brookside RP Lounge"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              onClick={saveServerName}
+              disabled={serverNameSaving}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60"
+            >
+              {serverNameSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Save
+            </button>
+          </div>
+        </label>
+        {serverNameMsg && (
+          <p
+            className={`mt-2 text-xs ${
+              serverNameMsg.type === "ok" ? "text-success" : "text-destructive"
+            }`}
+          >
+            {serverNameMsg.type === "ok" ? "✓" : "⚠"} {serverNameMsg.msg}
+          </p>
+        )}
+
+        <label className="mt-4 block">
+          <span className="mb-1 block text-xs font-semibold text-muted-foreground">
             Private Server "Enter Server" link
           </span>
           <div className="flex flex-col gap-2 sm:flex-row">
