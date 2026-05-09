@@ -51,6 +51,9 @@ function AdminPage() {
   const [serverUrl, setServerUrl] = useState("");
   const [serverSaving, setServerSaving] = useState(false);
   const [serverMsg, setServerMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [serverName, setServerName] = useState("");
+  const [serverNameSaving, setServerNameSaving] = useState(false);
+  const [serverNameMsg, setServerNameMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [avatars, setAvatars] = useState<Avatar[]>([]);
   const [avatarSavingId, setAvatarSavingId] = useState<string | null>(null);
 
@@ -72,10 +75,11 @@ function AdminPage() {
     const { data } = await supabase
       .from("site_settings")
       .select("key,value")
-      .in("key", ["discord_url", "private_server_url"]);
+      .in("key", ["discord_url", "private_server_url", "private_server_name"]);
     const map = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     setDiscordUrl(map["discord_url"] ?? "");
     setServerUrl(map["private_server_url"] ?? "");
+    setServerName(map["private_server_name"] ?? "");
   };
 
   const saveDiscord = async () => {
@@ -100,6 +104,18 @@ function AdminPage() {
     setServerSaving(false);
     if (error) setServerMsg({ type: "err", msg: error.message });
     else setServerMsg({ type: "ok", msg: "Saved!" });
+  };
+
+  const saveServerName = async () => {
+    setServerNameMsg(null);
+    setServerNameSaving(true);
+    const trimmed = serverName.trim().slice(0, 100);
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({ key: "private_server_name", value: trimmed }, { onConflict: "key" });
+    setServerNameSaving(false);
+    if (error) setServerNameMsg({ type: "err", msg: error.message });
+    else setServerNameMsg({ type: "ok", msg: "Saved!" });
   };
 
   useEffect(() => {
@@ -315,6 +331,42 @@ function AdminPage() {
             }`}
           >
             {discordMsg.type === "ok" ? "✓" : "⚠"} {discordMsg.msg}
+          </p>
+        )}
+
+        <label className="mt-4 block">
+          <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+            Private Server name
+          </span>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={serverName}
+              maxLength={100}
+              onChange={(e) => setServerName(e.target.value)}
+              placeholder="e.g. Brookside RP Lounge"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              onClick={saveServerName}
+              disabled={serverNameSaving}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60"
+            >
+              {serverNameSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Save
+            </button>
+          </div>
+        </label>
+        {serverNameMsg && (
+          <p
+            className={`mt-2 text-xs ${
+              serverNameMsg.type === "ok" ? "text-success" : "text-destructive"
+            }`}
+          >
+            {serverNameMsg.type === "ok" ? "✓" : "⚠"} {serverNameMsg.msg}
           </p>
         )}
 
