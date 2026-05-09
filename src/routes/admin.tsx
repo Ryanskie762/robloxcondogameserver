@@ -106,6 +106,18 @@ function AdminPage() {
     else setServerMsg({ type: "ok", msg: "Saved!" });
   };
 
+  const saveServerName = async () => {
+    setServerNameMsg(null);
+    setServerNameSaving(true);
+    const trimmed = serverName.trim().slice(0, 100);
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({ key: "private_server_name", value: trimmed }, { onConflict: "key" });
+    setServerNameSaving(false);
+    if (error) setServerNameMsg({ type: "err", msg: error.message });
+    else setServerNameMsg({ type: "ok", msg: "Saved!" });
+  };
+
   useEffect(() => {
     if (isAdmin) {
       loadGames();
