@@ -317,6 +317,42 @@ function AdminPage() {
             {discordMsg.type === "ok" ? "✓" : "⚠"} {discordMsg.msg}
           </p>
         )}
+
+        <label className="mt-4 block">
+          <span className="mb-1 block text-xs font-semibold text-muted-foreground">
+            Private Server "Enter Server" link
+          </span>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={serverUrl}
+              maxLength={500}
+              onChange={(e) => setServerUrl(e.target.value)}
+              placeholder="https://www.roblox.com/games/..."
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              onClick={saveServerUrl}
+              disabled={serverSaving}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60"
+            >
+              {serverSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Save
+            </button>
+          </div>
+        </label>
+        {serverMsg && (
+          <p
+            className={`mt-2 text-xs ${
+              serverMsg.type === "ok" ? "text-success" : "text-destructive"
+            }`}
+          >
+            {serverMsg.type === "ok" ? "✓" : "⚠"} {serverMsg.msg}
+          </p>
+        )}
       </div>
 
       <div className="mb-8 rounded-xl border border-border bg-card p-5 shadow-card">
