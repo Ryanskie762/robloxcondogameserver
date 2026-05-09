@@ -303,6 +303,78 @@ function AdminPage() {
         )}
       </div>
 
+      <div className="mb-8 rounded-xl border border-border bg-card p-5 shadow-card">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-xl font-bold">Private Server Avatars</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Roblox profile images shown on the Private Server page. Paste an image URL (e.g. your Roblox headshot URL).
+            </p>
+          </div>
+          <button
+            onClick={addAvatar}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
+          >
+            <Plus className="h-4 w-4" /> Add avatar
+          </button>
+        </div>
+        <div className="space-y-2">
+          {avatars.map((a, i) => (
+            <div key={a.id} className="flex flex-col gap-2 rounded-lg border border-border bg-surface/40 p-3 md:flex-row md:items-center">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-xs font-bold">
+                {a.image_url ? (
+                  <img src={a.image_url} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  a.label || String.fromCharCode(65 + i)
+                )}
+              </div>
+              <input
+                value={a.image_url}
+                maxLength={500}
+                onChange={(e) => updateAvatarLocal(a.id, { image_url: e.target.value })}
+                placeholder="https://... (Roblox avatar image URL)"
+                className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30"
+              />
+              <input
+                value={a.label}
+                maxLength={50}
+                onChange={(e) => updateAvatarLocal(a.id, { label: e.target.value })}
+                placeholder="Label / fallback"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30 md:w-36"
+              />
+              <input
+                type="number"
+                min={0}
+                value={a.sort_order}
+                onChange={(e) => updateAvatarLocal(a.id, { sort_order: Number(e.target.value) || 0 })}
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-glow focus:ring-2 focus:ring-primary/30 md:w-20"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => saveAvatar(a)}
+                  disabled={avatarSavingId === a.id}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-brand px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-60"
+                >
+                  {avatarSavingId === a.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                  Save
+                </button>
+                <button
+                  onClick={() => deleteAvatar(a.id)}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+          {avatars.length === 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              No avatars yet. Click <strong>Add avatar</strong> to create one.
+            </p>
+          )}
+        </div>
+      </div>
+
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-display text-xl font-bold">Community Games</h2>
         <button
