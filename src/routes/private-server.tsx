@@ -62,7 +62,7 @@ function PrivateServerPage() {
                 <Server className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="font-display text-lg font-bold">Brookside RP Lounge</h3>
+                <h3 className="font-display text-lg font-bold">{serverName}</h3>
                 <div className="text-xs text-muted-foreground">
                   Region: Global · Slots {avatars.length}/12
                 </div>
