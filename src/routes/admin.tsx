@@ -90,8 +90,53 @@ function AdminPage() {
     if (isAdmin) {
       loadGames();
       loadDiscord();
+      loadAvatars();
     }
   }, [isAdmin]);
+
+  const loadAvatars = async () => {
+    const { data } = await supabase
+      .from("private_server_avatars")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    setAvatars(data ?? []);
+  };
+
+  const updateAvatarLocal = (id: string, patch: Partial<Avatar>) => {
+    setAvatars((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
+  };
+
+  const saveAvatar = async (a: Avatar) => {
+    setAvatarSavingId(a.id);
+    const { error } = await supabase
+      .from("private_server_avatars")
+      .update({
+        image_url: (a.image_url ?? "").trim().slice(0, 500),
+        label: (a.label ?? "").trim().slice(0, 50),
+        sort_order: a.sort_order,
+      })
+      .eq("id", a.id);
+    setAvatarSavingId(null);
+    if (error) alert(error.message);
+  };
+
+  const addAvatar = async () => {
+    const nextOrder = (avatars[avatars.length - 1]?.sort_order ?? 0) + 1;
+    const { data, error } = await supabase
+      .from("private_server_avatars")
+      .insert({ image_url: "", label: "", sort_order: nextOrder })
+      .select()
+      .single();
+    if (error) return alert(error.message);
+    if (data) setAvatars((prev) => [...prev, data]);
+  };
+
+  const deleteAvatar = async (id: string) => {
+    if (!confirm("Delete this avatar?")) return;
+    const { error } = await supabase.from("private_server_avatars").delete().eq("id", id);
+    if (error) return alert(error.message);
+    setAvatars((prev) => prev.filter((a) => a.id !== id));
+  };
 
   if (loading) {
     return (
