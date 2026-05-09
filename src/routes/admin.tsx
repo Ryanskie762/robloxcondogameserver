@@ -68,13 +68,14 @@ function AdminPage() {
     setLoadingGames(false);
   };
 
-  const loadDiscord = async () => {
+  const loadSettings = async () => {
     const { data } = await supabase
       .from("site_settings")
-      .select("value")
-      .eq("key", "discord_url")
-      .maybeSingle();
-    setDiscordUrl(data?.value ?? "");
+      .select("key,value")
+      .in("key", ["discord_url", "private_server_url"]);
+    const map = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
+    setDiscordUrl(map["discord_url"] ?? "");
+    setServerUrl(map["private_server_url"] ?? "");
   };
 
   const saveDiscord = async () => {
@@ -89,10 +90,22 @@ function AdminPage() {
     else setDiscordMsg({ type: "ok", msg: "Saved!" });
   };
 
+  const saveServerUrl = async () => {
+    setServerMsg(null);
+    setServerSaving(true);
+    const trimmed = serverUrl.trim().slice(0, 500);
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({ key: "private_server_url", value: trimmed }, { onConflict: "key" });
+    setServerSaving(false);
+    if (error) setServerMsg({ type: "err", msg: error.message });
+    else setServerMsg({ type: "ok", msg: "Saved!" });
+  };
+
   useEffect(() => {
     if (isAdmin) {
       loadGames();
-      loadDiscord();
+      loadSettings();
       loadAvatars();
     }
   }, [isAdmin]);
