@@ -48,6 +48,9 @@ function AdminPage() {
   const [discordUrl, setDiscordUrl] = useState("");
   const [discordSaving, setDiscordSaving] = useState(false);
   const [discordMsg, setDiscordMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [serverUrl, setServerUrl] = useState("");
+  const [serverSaving, setServerSaving] = useState(false);
+  const [serverMsg, setServerMsg] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [avatars, setAvatars] = useState<Avatar[]>([]);
   const [avatarSavingId, setAvatarSavingId] = useState<string | null>(null);
 
