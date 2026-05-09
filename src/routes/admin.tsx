@@ -75,10 +75,11 @@ function AdminPage() {
     const { data } = await supabase
       .from("site_settings")
       .select("key,value")
-      .in("key", ["discord_url", "private_server_url"]);
+      .in("key", ["discord_url", "private_server_url", "private_server_name"]);
     const map = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
     setDiscordUrl(map["discord_url"] ?? "");
     setServerUrl(map["private_server_url"] ?? "");
+    setServerName(map["private_server_name"] ?? "");
   };
 
   const saveDiscord = async () => {
