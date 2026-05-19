@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
-import { Activity, Users, Loader2 } from "lucide-react";
+import { Activity, Users, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { useServerFn } from "@tanstack/react-start";
+import { verifyRobloxAge } from "@/lib/roblox.functions";
 
 export const Route = createFileRoute("/games")({
   head: () => ({
@@ -23,11 +25,33 @@ export const Route = createFileRoute("/games")({
 
 type Game = Tables<"community_games">;
 
+const STORAGE_KEY = "roblox_age_verified_v1";
+const MIN_DAYS = 50;
+
+type VerifiedInfo = { username: string; userId: number; ageDays: number };
+
 function GamesPage() {
   const { t } = useApp();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const today = new Date().toLocaleDateString("en-GB");
+
+  const [verified, setVerified] = useState<VerifiedInfo | null>(null);
+  const [checkingStorage, setCheckingStorage] = useState(true);
+  const [username, setUsername] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const verifyFn = useServerFn(verifyRobloxAge);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setVerified(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+    setCheckingStorage(false);
+  }, []);
 
   useEffect(() => {
     supabase
@@ -40,12 +64,116 @@ function GamesPage() {
       });
   }, []);
 
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setVerifying(true);
+    try {
+      const result = await verifyFn({ data: { username: username.trim() } });
+      if (!result.ok) {
+        setError(result.error);
+      } else {
+        const info: VerifiedInfo = {
+          username: result.username,
+          userId: result.userId,
+          ageDays: result.ageDays,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(info));
+        setVerified(info);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Verification failed. Try again.",
+      );
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleReset = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setVerified(null);
+    setUsername("");
+  };
+
   const onlineCount = games.filter((g) => g.online).length;
+
+  if (checkingStorage) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!verified) {
+    return (
+      <div>
+        <PageHero title={t("games.title")} desc={t("games.desc")} />
+        <section className="mx-auto max-w-md px-4 py-10">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <div className="mb-4 flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-bold">Roblox Age Verification</h2>
+            </div>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Enter your Roblox username. Your account must be at least{" "}
+              <strong className="text-foreground">{MIN_DAYS} days old</strong> to
+              access the community games.
+            </p>
+            <form onSubmit={handleVerify} className="space-y-3">
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Roblox username"
+                required
+                minLength={3}
+                maxLength={20}
+                pattern="[a-zA-Z0-9_]+"
+                disabled={verifying}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              {error && (
+                <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                  <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={verifying || !username.trim()}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+              >
+                {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
+                {verifying ? "Verifying..." : "Verify & Continue"}
+              </button>
+            </form>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div>
       <PageHero title={t("games.title")} desc={t("games.desc")} />
       <section className="mx-auto max-w-6xl px-4 py-10">
+        <div className="mb-4 flex items-center justify-between rounded-xl border border-success/30 bg-success/10 px-4 py-2 text-xs">
+          <div className="flex items-center gap-2 text-success">
+            <ShieldCheck className="h-4 w-4" />
+            <span>
+              Verified as <strong>{verified.username}</strong> ({verified.ageDays} days)
+            </span>
+          </div>
+          <button
+            onClick={handleReset}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Switch account
+          </button>
+        </div>
+
         <div className="mb-6 flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
           <div className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-success" />
