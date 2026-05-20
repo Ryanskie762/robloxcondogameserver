@@ -250,7 +250,12 @@ function PrivateServerPage() {
                 )}
                 {events.map((ev) => (
                   <li key={ev.id} className="flex items-center gap-2 text-xs">
-                    <UserPlus className="h-3.5 w-3.5 text-success" />
+                    <img
+                      src={ev.avatarUrl}
+                      alt={ev.name}
+                      loading="lazy"
+                      className="h-6 w-6 shrink-0 rounded-full border border-border bg-surface object-cover"
+                    />
                     <strong className="text-foreground">{ev.name}</strong>
                     <span className="text-muted-foreground">joined the server</span>
                   </li>
