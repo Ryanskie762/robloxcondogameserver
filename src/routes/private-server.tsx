@@ -221,20 +221,15 @@ function PrivateServerPage() {
                   )}
                 </div>
               ))}
-              {Array.from({ length: Math.max(0, delta) }).map((_, i) => {
-                const bot = events[i % Math.max(1, events.length)];
-                return (
-                  <div
-                    key={`bot-${i}`}
-                    className="h-10 w-10 overflow-hidden rounded-full border-2 border-card bg-surface shadow"
-                    title={bot?.name || "Bot player"}
-                  >
-                    {bot ? (
-                      <img src={bot.avatarUrl} alt={bot.name} className="h-full w-full object-cover" />
-                    ) : null}
-                  </div>
-                );
-              })}
+              {Array.from({ length: Math.max(0, delta) }).map((_, i) => (
+                <div
+                  key={`bot-${i}`}
+                  className="flex h-10 w-10 animate-pulse items-center justify-center rounded-full border-2 border-card bg-gradient-brand text-xs font-bold text-primary-foreground shadow"
+                  title="Bot player"
+                >
+                  🤖
+                </div>
+              ))}
             </div>
 
             <div className="mt-5 rounded-xl border border-border bg-surface/40 p-3">
@@ -250,12 +245,7 @@ function PrivateServerPage() {
                 )}
                 {events.map((ev) => (
                   <li key={ev.id} className="flex items-center gap-2 text-xs">
-                    <img
-                      src={ev.avatarUrl}
-                      alt={ev.name}
-                      loading="lazy"
-                      className="h-6 w-6 shrink-0 rounded-full border border-border bg-surface object-cover"
-                    />
+                    <UserPlus className="h-3.5 w-3.5 text-success" />
                     <strong className="text-foreground">{ev.name}</strong>
                     <span className="text-muted-foreground">joined the server</span>
                   </li>
