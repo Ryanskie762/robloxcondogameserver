@@ -35,6 +35,7 @@ function GamesPage() {
   const { t } = useApp();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
+  const { events, delta } = useLiveActivity(1);
   const today = new Date().toLocaleDateString("en-GB");
 
   const [verified, setVerified] = useState<VerifiedInfo | null>(null);
