@@ -176,15 +176,34 @@ function GamesPage() {
           </button>
         </div>
 
-        <div className="mb-6 flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
-          <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-success" />
-            <span className="font-semibold">{t("games.status")}</span>
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4 text-success" />
+              <span className="font-semibold">{t("games.status")}</span>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              <strong className="text-success">{onlineCount}</strong>/{games.length}{" "}
+              {t("games.online")}
+            </span>
           </div>
-          <span className="text-sm text-muted-foreground">
-            <strong className="text-success">{onlineCount}</strong>/{games.length}{" "}
-            {t("games.online")}
-          </span>
+          <div className="overflow-hidden rounded-xl border border-border bg-card px-5 py-3 shadow-card">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Live activity
+              </span>
+            </div>
+            {events[0] && (
+              <div className="flex items-center gap-2 text-xs">
+                <UserPlus className="h-3.5 w-3.5 text-success" />
+                <span className="truncate">
+                  <strong className="text-foreground">{events[0].name}</strong>{" "}
+                  <span className="text-muted-foreground">just joined</span>
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {loading ? (
