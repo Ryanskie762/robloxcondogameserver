@@ -228,7 +228,12 @@ function GamesPage() {
                     )}
                     {g.online && (
                       <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Users className="h-3 w-3" /> {g.players} {t("games.players")}
+                        <Users className="h-3 w-3" />
+                        <span className="text-success font-semibold">
+                          {Math.max(0, g.players + delta + ((g.name.length * 3) % 7) - 3)}
+                        </span>
+                        <span>{t("games.players")}</span>
+                        <span className="ml-1 h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
                       </div>
                     )}
                   </div>
