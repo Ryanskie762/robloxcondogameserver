@@ -46,6 +46,7 @@ function PrivateServerPage() {
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const verifyFn = useServerFn(verifyRobloxAge);
+  const { events, delta } = useLiveActivity(2);
 
   useEffect(() => {
     try {
