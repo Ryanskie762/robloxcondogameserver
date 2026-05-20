@@ -13,17 +13,17 @@ const ROBLOX_BOTS: { id: number; name: string }[] = [
   { id: 39413747, name: "Badcc" },
   { id: 13268404, name: "KreekCraft" },
   { id: 109313754, name: "DenisDaily" },
-  { id: 48ط103520, name: "Flamingo" }.id ? null as never : { id: 48103520, name: "Flamingo" },
+  { id: 48103520, name: "Flamingo" },
   { id: 21557, name: "Telamon" },
   { id: 13881122, name: "InceptionTime" },
   { id: 119281707, name: "Tofuu" },
-  { id: 110023035, name: "PinkLeaf" },
   { id: 30314903, name: "Tanqr" },
-  { id: 13268404, name: "KreekCraft" },
   { id: 261464730, name: "PrestonPlayz" },
   { id: 1019470, name: "Merely" },
   { id: 2266732, name: "Seranok" },
-].filter(Boolean) as { id: number; name: string }[];
+  { id: 16575987, name: "Roblox_Player" },
+  { id: 90243866, name: "DanTDM" },
+];
 
 export type JoinEvent = {
   id: number;
