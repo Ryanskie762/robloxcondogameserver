@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
-import { Activity, Users, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import { Activity, Users, Loader2, ShieldCheck, AlertCircle, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { useServerFn } from "@tanstack/react-start";
 import { verifyRobloxAge } from "@/lib/roblox.functions";
+import { useLiveActivity } from "@/lib/useLiveActivity";
 
 export const Route = createFileRoute("/games")({
   head: () => ({
@@ -34,6 +35,7 @@ function GamesPage() {
   const { t } = useApp();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
+  const { events, delta } = useLiveActivity(1);
   const today = new Date().toLocaleDateString("en-GB");
 
   const [verified, setVerified] = useState<VerifiedInfo | null>(null);
@@ -174,15 +176,34 @@ function GamesPage() {
           </button>
         </div>
 
-        <div className="mb-6 flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
-          <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-success" />
-            <span className="font-semibold">{t("games.status")}</span>
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4 text-success" />
+              <span className="font-semibold">{t("games.status")}</span>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              <strong className="text-success">{onlineCount}</strong>/{games.length}{" "}
+              {t("games.online")}
+            </span>
           </div>
-          <span className="text-sm text-muted-foreground">
-            <strong className="text-success">{onlineCount}</strong>/{games.length}{" "}
-            {t("games.online")}
-          </span>
+          <div className="overflow-hidden rounded-xl border border-border bg-card px-5 py-3 shadow-card">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Live activity
+              </span>
+            </div>
+            {events[0] && (
+              <div className="flex items-center gap-2 text-xs">
+                <UserPlus className="h-3.5 w-3.5 text-success" />
+                <span className="truncate">
+                  <strong className="text-foreground">{events[0].name}</strong>{" "}
+                  <span className="text-muted-foreground">just joined</span>
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -207,7 +228,12 @@ function GamesPage() {
                     )}
                     {g.online && (
                       <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Users className="h-3 w-3" /> {g.players} {t("games.players")}
+                        <Users className="h-3 w-3" />
+                        <span className="text-success font-semibold">
+                          {Math.max(0, g.players + delta + ((g.name.length * 3) % 7) - 3)}
+                        </span>
+                        <span>{t("games.players")}</span>
+                        <span className="ml-1 h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
                       </div>
                     )}
                   </div>

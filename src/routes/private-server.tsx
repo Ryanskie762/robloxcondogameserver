@@ -4,9 +4,10 @@ import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { Server, Zap, ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
+import { Server, Zap, ShieldCheck, AlertCircle, Loader2, UserPlus } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { verifyRobloxAge } from "@/lib/roblox.functions";
+import { useLiveActivity } from "@/lib/useLiveActivity";
 
 export const Route = createFileRoute("/private-server")({
   head: () => ({
@@ -45,6 +46,7 @@ function PrivateServerPage() {
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const verifyFn = useServerFn(verifyRobloxAge);
+  const { events, delta } = useLiveActivity(2);
 
   useEffect(() => {
     try {
@@ -188,7 +190,11 @@ function PrivateServerPage() {
               <div>
                 <h3 className="font-display text-lg font-bold">{serverName}</h3>
                 <div className="text-xs text-muted-foreground">
-                  Region: Global · Slots {avatars.length}/12
+                  Region: Global · Slots{" "}
+                  <span className="font-semibold text-success">
+                    {Math.min(12, avatars.length + Math.max(0, delta))}
+                  </span>
+                  /12
                 </div>
               </div>
             </div>
@@ -215,6 +221,36 @@ function PrivateServerPage() {
                   )}
                 </div>
               ))}
+              {Array.from({ length: Math.max(0, delta) }).map((_, i) => (
+                <div
+                  key={`bot-${i}`}
+                  className="flex h-10 w-10 animate-pulse items-center justify-center rounded-full border-2 border-card bg-gradient-brand text-xs font-bold text-primary-foreground shadow"
+                  title="Bot player"
+                >
+                  🤖
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-xl border border-border bg-surface/40 p-3">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Live joins
+                </span>
+              </div>
+              <ul className="space-y-1.5">
+                {events.length === 0 && (
+                  <li className="text-xs text-muted-foreground">Waiting for activity…</li>
+                )}
+                {events.map((ev) => (
+                  <li key={ev.id} className="flex items-center gap-2 text-xs">
+                    <UserPlus className="h-3.5 w-3.5 text-success" />
+                    <strong className="text-foreground">{ev.name}</strong>
+                    <span className="text-muted-foreground">joined the server</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <a
