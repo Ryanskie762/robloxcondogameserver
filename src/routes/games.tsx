@@ -195,9 +195,12 @@ function GamesPage() {
                     key={ev.id}
                     className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface/40 px-2.5 py-2 text-xs"
                   >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-[10px]">
-                      🤖
-                    </span>
+                    <img
+                      src={ev.avatarUrl}
+                      alt={ev.name}
+                      loading="lazy"
+                      className="h-8 w-8 shrink-0 rounded-full border border-border bg-surface object-cover"
+                    />
                     <div className="min-w-0">
                       <div className="truncate font-semibold text-foreground">{ev.name}</div>
                       <div className="text-[10px] text-muted-foreground">just joined</div>
