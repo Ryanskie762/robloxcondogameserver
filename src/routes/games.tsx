@@ -177,95 +177,110 @@ function GamesPage() {
           </button>
         </div>
 
-        <div className="mb-6 grid gap-3 sm:grid-cols-2">
-          <div className="flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-success" />
-              <span className="font-semibold">{t("games.status")}</span>
+        <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
+          <aside className="space-y-4">
+            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Live joins
+                </span>
+              </div>
+              <ul className="space-y-2">
+                {events.length === 0 && (
+                  <li className="text-xs text-muted-foreground">Waiting for activity…</li>
+                )}
+                {events.map((ev) => (
+                  <li
+                    key={ev.id}
+                    className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface/40 px-2.5 py-2 text-xs"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-[10px]">
+                      🤖
+                    </span>
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-foreground">{ev.name}</div>
+                      <div className="text-[10px] text-muted-foreground">just joined</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <span className="text-sm text-muted-foreground">
-              <strong className="text-success">{onlineCount}</strong>/{games.length}{" "}
-              {t("games.online")}
-            </span>
-          </div>
-          <div className="overflow-hidden rounded-xl border border-border bg-card px-5 py-3 shadow-card">
-            <div className="mb-1 flex items-center gap-2">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Live activity
+          </aside>
+
+          <div>
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-success" />
+                <span className="font-semibold">{t("games.status")}</span>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                <strong className="text-success">{onlineCount}</strong>/{games.length}{" "}
+                {t("games.online")}
               </span>
             </div>
-            {events[0] && (
-              <div className="flex items-center gap-2 text-xs">
-                <UserPlus className="h-3.5 w-3.5 text-success" />
-                <span className="truncate">
-                  <strong className="text-foreground">{events[0].name}</strong>{" "}
-                  <span className="text-muted-foreground">just joined</span>
-                </span>
+
+            {loading ? (
+              <div className="flex justify-center py-16">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {games.map((g) => {
+                  const linkLabel = (g.display_text?.trim() || g.link)?.trim();
+                  const Inner = (
+                    <>
+                      <div className="min-w-0">
+                        <div className="truncate font-semibold">{g.name}</div>
+                        <div className="mt-0.5 text-xs text-muted-foreground">
+                          {t("games.updated")} {today}
+                        </div>
+                        {g.online && g.link && linkLabel && (
+                          <div className="mt-1 truncate text-xs text-primary/90">
+                            {linkLabel}
+                          </div>
+                        )}
+                        {g.online && (
+                          <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                            <Users className="h-3 w-3" />
+                            <span className="text-success font-semibold">
+                              {Math.max(0, g.players + delta + ((g.name.length * 3) % 7) - 3)}
+                            </span>
+                            <span>{t("games.players")}</span>
+                            <span className="ml-1 h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
+                          </div>
+                        )}
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider ${
+                          g.online
+                            ? "bg-success/15 text-success"
+                            : "bg-destructive/15 text-destructive"
+                        }`}
+                      >
+                        {g.online ? `🟢 ${t("games.statusOn")}` : t("games.statusOff")}
+                      </span>
+                    </>
+                  );
+                  const cls = `group flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
+                    g.online && g.link
+                      ? "border-border bg-card shadow-card hover:-translate-y-0.5 hover:border-glow hover:shadow-glow"
+                      : "cursor-not-allowed border-border/50 bg-card/50 opacity-60"
+                  }`;
+                  return g.online && g.link ? (
+                    <a key={g.id} href={g.link} className={cls}>
+                      {Inner}
+                    </a>
+                  ) : (
+                    <div key={g.id} className={cls}>
+                      {Inner}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
-
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {games.map((g) => {
-              const linkLabel = (g.display_text?.trim() || g.link)?.trim();
-              const Inner = (
-                <>
-                  <div className="min-w-0">
-                    <div className="truncate font-semibold">{g.name}</div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      {t("games.updated")} {today}
-                    </div>
-                    {g.online && g.link && linkLabel && (
-                      <div className="mt-1 truncate text-xs text-primary/90">
-                        {linkLabel}
-                      </div>
-                    )}
-                    {g.online && (
-                      <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Users className="h-3 w-3" />
-                        <span className="text-success font-semibold">
-                          {Math.max(0, g.players + delta + ((g.name.length * 3) % 7) - 3)}
-                        </span>
-                        <span>{t("games.players")}</span>
-                        <span className="ml-1 h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
-                      </div>
-                    )}
-                  </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider ${
-                      g.online
-                        ? "bg-success/15 text-success"
-                        : "bg-destructive/15 text-destructive"
-                    }`}
-                  >
-                    {g.online ? `🟢 ${t("games.statusOn")}` : t("games.statusOff")}
-                  </span>
-                </>
-              );
-              const cls = `group flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
-                g.online && g.link
-                  ? "border-border bg-card shadow-card hover:-translate-y-0.5 hover:border-glow hover:shadow-glow"
-                  : "cursor-not-allowed border-border/50 bg-card/50 opacity-60"
-              }`;
-              return g.online && g.link ? (
-                <a key={g.id} href={g.link} className={cls}>
-                  {Inner}
-                </a>
-              ) : (
-                <div key={g.id} className={cls}>
-                  {Inner}
-                </div>
-              );
-            })}
-          </div>
-        )}
       </section>
     </div>
   );
