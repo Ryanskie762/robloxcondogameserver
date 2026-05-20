@@ -221,15 +221,20 @@ function PrivateServerPage() {
                   )}
                 </div>
               ))}
-              {Array.from({ length: Math.max(0, delta) }).map((_, i) => (
-                <div
-                  key={`bot-${i}`}
-                  className="flex h-10 w-10 animate-pulse items-center justify-center rounded-full border-2 border-card bg-gradient-brand text-xs font-bold text-primary-foreground shadow"
-                  title="Bot player"
-                >
-                  🤖
-                </div>
-              ))}
+              {Array.from({ length: Math.max(0, delta) }).map((_, i) => {
+                const bot = events[i % Math.max(1, events.length)];
+                return (
+                  <div
+                    key={`bot-${i}`}
+                    className="h-10 w-10 overflow-hidden rounded-full border-2 border-card bg-surface shadow"
+                    title={bot?.name || "Bot player"}
+                  >
+                    {bot ? (
+                      <img src={bot.avatarUrl} alt={bot.name} className="h-full w-full object-cover" />
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-5 rounded-xl border border-border bg-surface/40 p-3">
