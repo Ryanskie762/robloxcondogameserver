@@ -253,6 +253,8 @@ function PrivateServerPage() {
           </div>
         </div>
       </section>
+      <LiveJoinToasts seed={22} context="joined private server" />
     </div>
+
   );
 }
