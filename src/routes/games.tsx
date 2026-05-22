@@ -9,8 +9,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { verifyRobloxAge } from "@/lib/roblox.functions";
 import { useLiveActivity } from "@/lib/useLiveActivity";
 import { LiveJoinToasts } from "@/components/LiveJoinToasts";
-import { GameDetailModal } from "@/components/GameDetailModal";
-
 
 
 export const Route = createFileRoute("/games")({
@@ -38,9 +36,7 @@ type VerifiedInfo = { username: string; userId: number; ageDays: number };
 function GamesPage() {
   const { t } = useApp();
   const [games, setGames] = useState<Game[]>([]);
-  const [selected, setSelected] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
-
   const { delta } = useLiveActivity(1);
   const [today, setToday] = useState("");
   useEffect(() => setToday(new Date().toLocaleDateString("en-GB")), []);
@@ -244,35 +240,22 @@ function GamesPage() {
                       ? "border-border bg-card shadow-card hover:-translate-y-0.5 hover:border-glow hover:shadow-glow"
                       : "cursor-not-allowed border-border/50 bg-card/50 opacity-60"
                   }`;
-                  const clickable = g.online && g.link;
-                  return (
-                    <button
-                      key={g.id}
-                      type="button"
-                      onClick={() => clickable && setSelected(g)}
-                      disabled={!clickable}
-                      className={cls + " w-full"}
-                    >
+                  return g.online && g.link ? (
+                    <a key={g.id} href={g.link} className={cls}>
                       {Inner}
-                    </button>
+                    </a>
+                  ) : (
+                    <div key={g.id} className={cls}>
+                      {Inner}
+                    </div>
                   );
                 })}
-
               </div>
             )}
           </div>
       </section>
       <LiveJoinToasts seed={11} context="joined community games" />
-      <GameDetailModal
-        game={selected}
-        livePlayers={
-          selected
-            ? Math.max(0, selected.players + delta + ((selected.name.length * 3) % 7) - 3)
-            : undefined
-        }
-        onClose={() => setSelected(null)}
-      />
     </div>
-  );
 
+  );
 }
