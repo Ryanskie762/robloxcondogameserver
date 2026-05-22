@@ -38,7 +38,9 @@ type VerifiedInfo = { username: string; userId: number; ageDays: number };
 function GamesPage() {
   const { t } = useApp();
   const [games, setGames] = useState<Game[]>([]);
+  const [selected, setSelected] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
+
   const { delta } = useLiveActivity(1);
   const [today, setToday] = useState("");
   useEffect(() => setToday(new Date().toLocaleDateString("en-GB")), []);
