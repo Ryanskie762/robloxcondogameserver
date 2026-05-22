@@ -180,38 +180,8 @@ function GamesPage() {
           </button>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
-          <aside className="space-y-4">
-            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-              <div className="mb-3 flex items-center gap-2">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Live joins
-                </span>
-              </div>
-              <ul className="space-y-2">
-                {events.length === 0 && (
-                  <li className="text-xs text-muted-foreground">Waiting for activity…</li>
-                )}
-                {events.map((ev) => (
-                  <li
-                    key={ev.id}
-                    className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface/40 px-2.5 py-2 text-xs"
-                  >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-[10px]">
-                      🤖
-                    </span>
-                    <div className="min-w-0">
-                      <div className="truncate font-semibold text-foreground">{ev.name}</div>
-                      <div className="text-[10px] text-muted-foreground">just joined</div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+        <div>
 
-          <div>
             <div className="mb-4 flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-success" />
