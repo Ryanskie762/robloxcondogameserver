@@ -4,10 +4,12 @@ import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { Server, Zap, ShieldCheck, AlertCircle, Loader2, UserPlus } from "lucide-react";
+import { Server, Zap, ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { verifyRobloxAge } from "@/lib/roblox.functions";
 import { useLiveActivity } from "@/lib/useLiveActivity";
+import { LiveJoinToasts } from "@/components/LiveJoinToasts";
+
 
 export const Route = createFileRoute("/private-server")({
   head: () => ({
