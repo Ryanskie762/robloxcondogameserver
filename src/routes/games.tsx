@@ -38,8 +38,9 @@ function GamesPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const { delta } = useLiveActivity(1);
-
+  const [today, setToday] = useState("");
   useEffect(() => setToday(new Date().toLocaleDateString("en-GB")), []);
+
 
   const [verified, setVerified] = useState<VerifiedInfo | null>(null);
   const [checkingStorage, setCheckingStorage] = useState(true);
