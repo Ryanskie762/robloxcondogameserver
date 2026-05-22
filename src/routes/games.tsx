@@ -9,6 +9,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { verifyRobloxAge } from "@/lib/roblox.functions";
 import { useLiveActivity } from "@/lib/useLiveActivity";
 import { LiveJoinToasts } from "@/components/LiveJoinToasts";
+import { GameDetailModal } from "@/components/GameDetailModal";
+
 
 
 export const Route = createFileRoute("/games")({
