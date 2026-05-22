@@ -253,8 +253,9 @@ function GamesPage() {
               </div>
             )}
           </div>
-        </div>
       </section>
+      <LiveJoinToasts seed={11} context="joined community games" />
     </div>
+
   );
 }
