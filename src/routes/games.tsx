@@ -263,7 +263,16 @@ function GamesPage() {
           </div>
       </section>
       <LiveJoinToasts seed={11} context="joined community games" />
+      <GameDetailModal
+        game={selected}
+        livePlayers={
+          selected
+            ? Math.max(0, selected.players + delta + ((selected.name.length * 3) % 7) - 3)
+            : undefined
+        }
+        onClose={() => setSelected(null)}
+      />
     </div>
-
   );
+
 }
