@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
-import { Activity, Users, Loader2, ShieldCheck, AlertCircle, UserPlus } from "lucide-react";
+import { Activity, Users, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { useServerFn } from "@tanstack/react-start";
 import { verifyRobloxAge } from "@/lib/roblox.functions";
 import { useLiveActivity } from "@/lib/useLiveActivity";
+import { LiveJoinToasts } from "@/components/LiveJoinToasts";
+
 
 export const Route = createFileRoute("/games")({
   head: () => ({
@@ -35,9 +37,10 @@ function GamesPage() {
   const { t } = useApp();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
-  const { events, delta } = useLiveActivity(1);
+  const { delta } = useLiveActivity(1);
   const [today, setToday] = useState("");
   useEffect(() => setToday(new Date().toLocaleDateString("en-GB")), []);
+
 
   const [verified, setVerified] = useState<VerifiedInfo | null>(null);
   const [checkingStorage, setCheckingStorage] = useState(true);
@@ -177,38 +180,8 @@ function GamesPage() {
           </button>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
-          <aside className="space-y-4">
-            <div className="rounded-xl border border-border bg-card p-4 shadow-card">
-              <div className="mb-3 flex items-center gap-2">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Live joins
-                </span>
-              </div>
-              <ul className="space-y-2">
-                {events.length === 0 && (
-                  <li className="text-xs text-muted-foreground">Waiting for activity…</li>
-                )}
-                {events.map((ev) => (
-                  <li
-                    key={ev.id}
-                    className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface/40 px-2.5 py-2 text-xs"
-                  >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-[10px]">
-                      🤖
-                    </span>
-                    <div className="min-w-0">
-                      <div className="truncate font-semibold text-foreground">{ev.name}</div>
-                      <div className="text-[10px] text-muted-foreground">just joined</div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+        <div>
 
-          <div>
             <div className="mb-4 flex items-center justify-between rounded-xl border border-border bg-card px-5 py-3 shadow-card">
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-success" />
@@ -280,8 +253,9 @@ function GamesPage() {
               </div>
             )}
           </div>
-        </div>
       </section>
+      <LiveJoinToasts seed={11} context="joined community games" />
     </div>
+
   );
 }
