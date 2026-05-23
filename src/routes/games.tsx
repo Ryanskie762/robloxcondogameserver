@@ -39,6 +39,7 @@ function GamesPage() {
   const [loading, setLoading] = useState(true);
   const { delta } = useLiveActivity(1);
   const [today, setToday] = useState("");
+  const [openGame, setOpenGame] = useState<Game | null>(null);
   useEffect(() => setToday(new Date().toLocaleDateString("en-GB")), []);
 
 
