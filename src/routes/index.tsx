@@ -24,6 +24,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { t } = useApp();
+  const { total, loaded } = useGlobalPlayers();
   const today = new Date().toLocaleDateString("en-GB");
 
   const cards = [
