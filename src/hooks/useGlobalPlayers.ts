@@ -19,8 +19,8 @@ export function useGlobalPlayers() {
       supabase.from("private_server_avatars").select("id").order("sort_order", { ascending: true }),
     ]).then(([gamesRes, avatarsRes]) => {
       if (cancelled) return;
-      setGames((gamesRes.data as Game[]) ?? []);
-      setAvatars((avatarsRes.data as Avatar[]) ?? []);
+      setGames((gamesRes.data as unknown as Game[]) ?? []);
+      setAvatars((avatarsRes.data as unknown as Avatar[]) ?? []);
       setLoaded(true);
     });
     return () => { cancelled = true; };
