@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Gamepad2, Server, LifeBuoy, Settings2, Wrench, ArrowRight, Users, Calendar } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
+import { useGlobalPlayers } from "@/hooks/useGlobalPlayers";
 
 export const Route = createFileRoute("/")({
   head: () => ({
