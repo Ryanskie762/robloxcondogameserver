@@ -2,8 +2,9 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLiveActivity } from "@/lib/useLiveActivity";
 
-type Game = { id: number; name: string; online: boolean; players: number };
-type Avatar = { id: number };
+type Game = { id: string; name: string; online: boolean; players: number };
+type Avatar = { id: string };
+
 
 export function useGlobalPlayers() {
   const [games, setGames] = useState<Game[]>([]);
