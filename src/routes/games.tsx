@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
-import { Activity, Users, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import { Activity, Users, Loader2, ShieldCheck, AlertCircle, X, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -39,6 +39,7 @@ function GamesPage() {
   const [loading, setLoading] = useState(true);
   const { delta } = useLiveActivity(1);
   const [today, setToday] = useState("");
+  const [openGame, setOpenGame] = useState<Game | null>(null);
   useEffect(() => setToday(new Date().toLocaleDateString("en-GB")), []);
 
 
@@ -241,9 +242,14 @@ function GamesPage() {
                       : "cursor-not-allowed border-border/50 bg-card/50 opacity-60"
                   }`;
                   return g.online && g.link ? (
-                    <a key={g.id} href={g.link} className={cls}>
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => setOpenGame(g)}
+                      className={cls + " w-full"}
+                    >
                       {Inner}
-                    </a>
+                    </button>
                   ) : (
                     <div key={g.id} className={cls}>
                       {Inner}
@@ -254,8 +260,60 @@ function GamesPage() {
             )}
           </div>
       </section>
+
+      {openGame && openGame.link && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+          onClick={() => setOpenGame(null)}
+        >
+          <div
+            className="relative flex h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-glow"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-border bg-surface/60 px-4 py-3">
+              <div className="min-w-0">
+                <div className="truncate font-semibold">{openGame.name}</div>
+                <div className="truncate text-xs text-muted-foreground">{openGame.link}</div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <a
+                  href={openGame.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium hover:border-glow"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Open directly
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setOpenGame(null)}
+                  className="rounded-lg border border-border bg-background p-1.5 hover:border-glow"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            <iframe
+              key={openGame.id}
+              src={openGame.link}
+              title={openGame.name}
+              className="h-full w-full flex-1 bg-background"
+              sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+              referrerPolicy="no-referrer"
+            />
+            <div className="border-t border-border bg-surface/40 px-4 py-2 text-[11px] text-muted-foreground">
+              Some sites (like Roblox) block embedding. If the frame is blank, use "Open directly".
+            </div>
+          </div>
+        </div>
+      )}
+
       <LiveJoinToasts seed={11} context="joined community games" />
     </div>
+
+
 
   );
 }
