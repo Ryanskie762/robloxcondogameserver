@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/PageHero";
 import { useApp } from "@/contexts/AppContext";
-import { Activity, Users, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import { Activity, Users, Loader2, ShieldCheck, AlertCircle, X, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
