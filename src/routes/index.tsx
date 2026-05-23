@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Gamepad2, Server, LifeBuoy, Settings2, Wrench, ArrowRight, Users, Calendar } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
+import { useGlobalPlayers } from "@/hooks/useGlobalPlayers";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { t } = useApp();
+  const { total, loaded } = useGlobalPlayers();
   const today = new Date().toLocaleDateString("en-GB");
 
   const cards = [
@@ -79,7 +81,7 @@ function Index() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
               <Users className="h-4 w-4 text-success" />
-              <strong className="text-foreground">190</strong> {t("home.online")}
+              <strong className="text-foreground">{loaded ? total.toLocaleString() : "—"}</strong> {t("home.online")}
             </span>
             <span className="hidden h-4 w-px bg-border md:block" />
             <span className="inline-flex items-center gap-1.5">
